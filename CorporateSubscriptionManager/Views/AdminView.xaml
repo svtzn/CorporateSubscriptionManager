@@ -1,0 +1,126 @@
+<UserControl x:Class="CorporateSubscriptionManager.Views.AdminView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid Margin="12">
+        <TabControl>
+            <!-- Services -->
+            <TabItem Header="Services">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid ItemsSource="{Binding Services}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedService}" Grid.Row="0" Margin="0,0,0,8" IsReadOnly="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding ServiceID}" IsReadOnly="True" Width="60"/>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="120"/>
+                            <DataGridTextColumn Header="PricePerUser" Binding="{Binding PricePerUser}" Width="100"/>
+                            <DataGridTextColumn Header="RenewalCycle" Binding="{Binding RenewalCycle}" Width="120"/>
+                            <DataGridCheckBoxColumn Header="IsActive" Binding="{Binding IsActive}" Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left">
+                        <Button Content="Create" Command="{Binding NewServiceCommand}" />
+                        <Button Content="Save" Command="{Binding SaveServiceCommand}" />
+                        <Button Content="On/Off" Command="{Binding ToggleServiceActiveCommand}" CommandParameter="{Binding SelectedService}" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!-- Requests -->
+            <TabItem Header="Requests">
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Requests}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#DDD" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,8" Background="White">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="240"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Employee.Name}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding ServiceName}" Margin="0,6,0,0"/>
+                                            <TextBlock Text="{Binding RequestDate, StringFormat='Date: {0:dd.MM.yyyy HH:mm}'}" Foreground="Gray" FontSize="11" Margin="0,6,0,0"/>
+                                            <TextBlock Text="{Binding Comment}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                            <TextBlock Text="{Binding Status}" Foreground="Gray" Margin="0,6,0,0"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,6">
+                                                <TextBlock Text="Start:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                <DatePicker SelectedDate="{Binding SelectedStartDate, Mode=TwoWay}" />
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                <Button Content="Accept" Command="{Binding DataContext.ApproveRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="0,0,6,0" />
+                                                <Button Content="Reject" Command="{Binding DataContext.RejectRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Assignments -->
+            <TabItem Header="Subscribes">
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Assignments}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#EEE" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,8" Background="White">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="200"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Service.Name}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Employee.Name}" Margin="0,6,0,0"/>
+                                            <TextBlock Text="{Binding StartDate, StringFormat='Start: {0:dd.MM.yyyy}'}" Margin="0,6,0,0"/>
+                                            <TextBlock Text="{Binding EndDate, StringFormat='End: {0:dd.MM.yyyy}'}" Margin="0,6,0,0"/>
+                                            <TextBlock Text="{Binding Status}" Foreground="Gray" Margin="0,6,0,0"/>
+                                            <TextBlock Text="{Binding ApproverID, StringFormat='Approved by (ID): {0}'}" FontSize="11" Foreground="Gray" Margin="0,6,0,0"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <Button Content="Extend" Command="{Binding DataContext.ExtendAssignmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="0,0,0,6"/>
+                                            <Button Content="Stop" Command="{Binding DataContext.SuspendAssignmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="0,0,0,6"/>
+                                            <Button Content="Deactivate" Command="{Binding DataContext.DeactivateAssignmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Reports -->
+            <TabItem Header="Reports">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Content="Update repost" Click="RefreshReport_Click" Width="140" />
+                    <TextBox Grid.Row="1" Text="{Binding ReportText}" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

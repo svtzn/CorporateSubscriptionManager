@@ -22,7 +22,7 @@ namespace CorporateSubscriptionManager.Services
 
             // Sample Employees (логины/пароли для теста: admin/admin, manager/manager, employee/employee)
             _employees.Add(new Employee { EmployeeID = 1, DepartmentID = 1, Name = "Admin User", Role = "Admin", IsActive = true, Login = "admin", Password = "admin" });
-            _employees.Add(new Employee { EmployeeID = 2, DepartmentID = 1, Name = "Employee IT1", Role = "Employee", IsActive = true, Login = "emp1", Password = "pass" });
+            _employees.Add(new Employee { EmployeeID = 2, DepartmentID = 2, Name = "Employee IT1", Role = "Employee", IsActive = true, Login = "emp1", Password = "pass" });
             _employees.Add(new Employee { EmployeeID = 3, DepartmentID = 2, Name = "Manager Finance", Role = "Manager", IsActive = true, Login = "manager", Password = "manager" });
             _employees.Add(new Employee { EmployeeID = 4, DepartmentID = 2, Name = "Employee Finance1", Role = "Employee", IsActive = true, Login = "emp2", Password = "pass" });
             _employees.Add(new Employee { EmployeeID = 5, DepartmentID = 3, Name = "Manager HR", Role = "Manager", IsActive = true, Login = "managerhr", Password = "pass" });
@@ -37,10 +37,16 @@ namespace CorporateSubscriptionManager.Services
 
             // Sample Requests
             _requests.Add(new SubscriptionRequest { RequestID = 1, EmployeeID = 2, ServiceID = 1, ManagerID = 1, RequestDate = DateTime.Now.AddDays(-5), Status = "Pending", Comment = "Need for work" });
-            _requests.Add(new SubscriptionRequest { RequestID = 2, EmployeeID = 4, ServiceID = 2, ManagerID = 3, RequestDate = DateTime.Now.AddDays(-3), Status = "Approved", DecisionDate = DateTime.Now.AddDays(-2) });
+            _requests.Add(new SubscriptionRequest { RequestID = 3, EmployeeID = 3, ServiceID = 2, ManagerID = 1, RequestDate = DateTime.Now.AddDays(-5), Status = "Pending", Comment = "Need for work" });
+            _requests.Add(new SubscriptionRequest { RequestID = 2, EmployeeID = 6, ServiceID = 3, ManagerID = 1, RequestDate = DateTime.Now.AddDays(-5), Status = "Pending", Comment = "Need for work" });
+            _requests.Add(new SubscriptionRequest { RequestID = 4, EmployeeID = 1, ServiceID = 4, ManagerID = 3, RequestDate = DateTime.Now.AddDays(-5), Status = "Pending", Comment = "Need for work" });
+            _requests.Add(new SubscriptionRequest { RequestID = 5, EmployeeID = 4, ServiceID = 5, ManagerID = 3, RequestDate = DateTime.Now.AddDays(-5), Status = "Pending", Comment = "Need for work" });
+            _requests.Add(new SubscriptionRequest { RequestID = 6, EmployeeID = 4, ServiceID = 2, ManagerID = 3, RequestDate = DateTime.Now.AddDays(-3), Status = "Approved", DecisionDate = DateTime.Now.AddDays(-2) });
 
             // Sample Assignments
             _assignments.Add(new SubscriptionAssignment { AssignmentID = 1, EmployeeID = 2, ServiceID = 2, RequestID = 2, ApproverID = 3, Status = "Active", StartDate = DateTime.Now.AddDays(-2), EndDate = DateTime.Now.AddMonths(1) });
+            _assignments.Add(new SubscriptionAssignment { AssignmentID = 2, EmployeeID = 2, ServiceID = 2, RequestID = 2, ApproverID = 3, Status = "Active", StartDate = DateTime.Now.AddDays(-2), EndDate = DateTime.Now.AddMonths(1) });
+            _assignments.Add(new SubscriptionAssignment { AssignmentID = 3, EmployeeID = 2, ServiceID = 2, RequestID = 2, ApproverID = 3, Status = "Active", StartDate = DateTime.Now.AddDays(-2), EndDate = DateTime.Now.AddMonths(1) });
 
 
         }
@@ -68,9 +74,6 @@ namespace CorporateSubscriptionManager.Services
         public static List<SubscriptionRequest> GetRequests() => _requests;
         public static List<SubscriptionRequest> GetRequestsForManager(int managerId) => _requests.Where(r => r.ManagerID == managerId && r.Status == "Pending").ToList();
         // Добавить похожие для других
-        // ...
-
-        // Добавь в конец класса MockData
 
         // Для Requests
         public static List<SubscriptionRequest> GetRequestsForEmployee(int employeeId) => _requests.Where(r => r.EmployeeID == employeeId).ToList();
@@ -97,6 +100,7 @@ namespace CorporateSubscriptionManager.Services
                 existing.Status = req.Status;
                 existing.Comment = req.Comment;
                 existing.DecisionDate = req.DecisionDate;
+                existing.ApproverID = req.ApproverID; // <-- сохранение кто принял решение
                 // etc.
             }
         }
@@ -109,5 +113,25 @@ namespace CorporateSubscriptionManager.Services
             _assignments.Add(assign);
         }
         // Похожие Update/Delete, если нужно
+
+
+        public static List<Department> GetDepartments() => _departments;
+
+        public static List<SubscriptionRequest> GetAllRequests() => _requests;
+
+        public static List<SubscriptionAssignment> GetAllAssignments() => _assignments;
+
+        public static void UpdateAssignment(SubscriptionAssignment a)
+        {
+            var existing = _assignments.FirstOrDefault(x => x.AssignmentID == a.AssignmentID);
+            if (existing != null)
+            {
+                existing.Status = a.Status;
+                existing.StartDate = a.StartDate;
+                existing.EndDate = a.EndDate;
+                existing.ApproverID = a.ApproverID;
+            }
+        }
     }
+
 }

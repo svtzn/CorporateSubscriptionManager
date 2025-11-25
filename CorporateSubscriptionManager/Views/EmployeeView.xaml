@@ -1,26 +1,74 @@
 ﻿<UserControl x:Class="CorporateSubscriptionManager.Views.EmployeeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="20">
+    <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
-            <TextBlock Text="Мои подписки" FontSize="18" Margin="0,0,10,0"/>
-            <Button Content="Подать новую заявку" Command="{Binding NewRequestCommand}" />
+
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,12" VerticalAlignment="Center">
+            <TextBlock Text="Мои подписки" FontSize="18" FontWeight="Bold" Margin="0,0,12,0"/>
         </StackPanel>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Assignments}" AutoGenerateColumns="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Сервис" Binding="{Binding ServiceName}" Width="*"/>
-                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="Auto"/>
-                <DataGridTextColumn Header="Дата начала" Binding="{Binding StartDate, StringFormat=dd.MM.yyyy}" Width="Auto"/>
-                <DataGridTextColumn Header="Дата окончания" Binding="{Binding EndDate, StringFormat=dd.MM.yyyy}" Width="Auto"/>
-            </DataGrid.Columns>
-        </DataGrid>
+
+        <!-- Карточки подписок -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Assignments}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" ItemHeight="160" ItemWidth="260" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="240" Margin="8" Padding="10" CornerRadius="6" Background="White" BorderThickness="1" BorderBrush="#E0E0E0" >
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Status}" Value="Active">
+                                            <Setter Property="BorderBrush" Value="#4CAF50"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Status}" Value="Pending">
+                                            <Setter Property="BorderBrush" Value="#FFC107"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Status}" Value="Suspended">
+                                            <Setter Property="BorderBrush" Value="#F44336"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Status}" Value="Expired">
+                                            <Setter Property="BorderBrush" Value="#9E9E9E"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="{Binding ServiceName}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Row="1" Text="{Binding Status}" Foreground="Gray" Margin="0,8,0,0"/>
+                                
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Text="{Binding StartDate, StringFormat='Начало: {0:dd.MM.yyyy}'}" FontSize="11"/>
+                                        <TextBlock Text="{Binding EndDate, StringFormat='Окончание: {0:dd.MM.yyyy}'}" FontSize="11"/>
+                                        <TextBlock Text="{Binding Approver.Name, StringFormat='Одобрил: {0}'}" FontSize="11" Margin="0,6,0,0"/>
+                                        <TextBlock Text="{Binding ApproverID, StringFormat='ApproverID: {0}'}" FontSize="11" Foreground="Gray"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </UserControl>

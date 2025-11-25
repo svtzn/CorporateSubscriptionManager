@@ -7,7 +7,14 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <ContentControl x:Name="MainContent" Grid.Row="1"/>
-        <!-- Предполагая Grid в MainWindow -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!-- Левая панель навигации -->
+        <StackPanel x:Name="NavPanel" Grid.Column="0" Background="#FFF0F0F0" Margin="0"/>
+
+        <!-- Контент по правую сторону -->
+        <ContentControl x:Name="MainContent" Grid.Column="1" />
     </Grid>
 </Window>

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows;
 using CorporateSubscriptionManager.Models;
 using CorporateSubscriptionManager.Services;
@@ -8,6 +9,7 @@ namespace CorporateSubscriptionManager.ViewModels
     public class RequestViewModel : BaseViewModel
     {
         public ObservableCollection<Service> Services { get; set; } = new ObservableCollection<Service>();
+        public ObservableCollection<SubscriptionRequest> Requests { get; set; } = new ObservableCollection<SubscriptionRequest>();
 
         private Service _selectedService;
         public Service SelectedService
@@ -26,12 +28,23 @@ namespace CorporateSubscriptionManager.ViewModels
         public RelayCommand SubmitCommand { get; }
         public RelayCommand CancelCommand { get; }
 
-        private readonly Window _window;
+        // Внешние колбэки — вызываются после отправки/отмены (для вкладки)
+        public Action OnSubmitted { get; set; }
+        public Action OnCancelled { get; set; }
 
-        public RequestViewModel(Window window)
+        // Сохраним совместимость: если используется Window, старый конструктор оставлен
+        public RequestViewModel(Window window) : this()
         {
-            _window = window;
+            // Закрывать окно при использовании старого паттерна
+            OnSubmitted = () => window.Close();
+            OnCancelled = () => window.Close();
+        }
+
+        // Вариант для использования в UserControl (вкладке)
+        public RequestViewModel()
+        {
             LoadServices();
+            LoadRequests();
             SubmitCommand = new RelayCommand(SubmitExecute, CanSubmit);
             CancelCommand = new RelayCommand(CancelExecute);
         }
@@ -42,6 +55,19 @@ namespace CorporateSubscriptionManager.ViewModels
             foreach (var svc in MockData.GetServices())
             {
                 Services.Add(svc);
+            }
+        }
+
+        public void LoadRequests()
+        {
+            Requests.Clear();
+            var reqs = MockData.GetRequestsForEmployee(CurrentUser.Current.EmployeeID);
+            foreach (var r in reqs)
+            {
+                // Заполним навигационные свойства на случай, если они не установлены
+                r.Service = r.Service ?? MockData.GetService(r.ServiceID);
+                r.Employee = r.Employee ?? MockData.GetEmployee(r.EmployeeID);
+                Requests.Add(r);
             }
         }
 
@@ -57,12 +83,17 @@ namespace CorporateSubscriptionManager.ViewModels
             };
             MockData.AddRequest(req);
             MessageBox.Show("Заявка подана!");
-            _window.Close();
+            // Обновляем список карточек
+            LoadRequests();
+            // Сброс формы
+            SelectedService = null;
+            Comment = string.Empty;
+            OnSubmitted?.Invoke();
         }
 
         private void CancelExecute(object parameter)
         {
-            _window.Close();
+            OnCancelled?.Invoke();
         }
     }
 }

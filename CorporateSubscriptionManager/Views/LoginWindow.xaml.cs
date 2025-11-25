@@ -9,7 +9,6 @@ namespace CorporateSubscriptionManager
         public LoginWindow()
         {
             InitializeComponent();
-            MessageBox.Show("LoginWindow created");
             DataContext = new ViewModels.LoginViewModel(this);
         }
         private void PasswordBox_KeyDown(object sender, KeyEventArgs e)
