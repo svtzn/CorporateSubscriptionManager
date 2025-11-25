@@ -11,8 +11,11 @@ namespace CorporateSubscriptionManager.ViewModels
 
         public RelayCommand NewRequestCommand { get; }
 
+        private readonly SqlDataService _dataService;
+
         public EmployeeViewModel()
         {
+            _dataService = new SqlDataService(ConnectionProvider.DefaultConnection);
             LoadData();
             NewRequestCommand = new RelayCommand(NewRequestExecute);
         }
@@ -20,10 +23,17 @@ namespace CorporateSubscriptionManager.ViewModels
         private void LoadData()
         {
             Assignments.Clear();
-            var userAssignments = MockData.GetAssignmentsForEmployee(CurrentUser.Current.EmployeeID);
-            foreach (var assign in userAssignments)
+            try
             {
-                Assignments.Add(assign);
+                var userAssignments = _dataService.GetAssignmentsForEmployee(CurrentUser.Current.EmployeeID);
+                foreach (var assign in userAssignments)
+                {
+                    Assignments.Add(assign);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show("Ошибка при загрузке назначений: " + ex.Message);
             }
         }
 
@@ -31,8 +41,7 @@ namespace CorporateSubscriptionManager.ViewModels
         {
             var form = new RequestFormWindow();
             form.ShowDialog();
-            // После закрытия - обновить данные, если нужно (для просмотра заявок, но по ТЗ Employee видит только подписки)
-            LoadData(); // На случай, если заявка сразу одобрена, но пока нет
+            LoadData();
         }
     }
 }

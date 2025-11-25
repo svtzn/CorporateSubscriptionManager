@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using CorporateSubscriptionManager.Models;
 using CorporateSubscriptionManager.Services;
@@ -75,11 +76,34 @@ namespace CorporateSubscriptionManager.ViewModels
 
         private void SubmitExecute(object parameter)
         {
+            // Определяем менеджера: сначала из отдела, иначе пытаемся найти первого менеджера в том же департаменте
+            int? managerId = null;
+            try
+            {
+                var dept = MockData.GetDepartment(CurrentUser.Current.DepartmentID);
+                managerId = dept?.ManagerID;
+                if (!managerId.HasValue)
+                {
+                    var mgr = MockData.GetEmployees()
+                                .FirstOrDefault(e => e.DepartmentID == CurrentUser.Current.DepartmentID
+                                                     && string.Equals(e.Role, "Manager", StringComparison.OrdinalIgnoreCase)
+                                                     && e.IsActive);
+                    managerId = mgr?.EmployeeID;
+                }
+            }
+            catch
+            {
+                managerId = null;
+            }
+
             var req = new SubscriptionRequest
             {
                 EmployeeID = CurrentUser.Current.EmployeeID,
                 ServiceID = SelectedService.ServiceID,
-                Comment = Comment
+                ManagerID = managerId,
+                Comment = Comment,
+                RequestDate = DateTime.Now,
+                Status = "Pending"
             };
             MockData.AddRequest(req);
             MessageBox.Show("Заявка подана!");
